@@ -16,7 +16,7 @@ pub struct MuxTx {
     pub data: Vec<u8>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MuxCmd {
     pub mux_id: usize,
     pub lport: u32,
@@ -37,7 +37,6 @@ impl fmt::Display for Error {
         }
     }
 }
-
 impl From<ParseIntError> for Error {
     fn from(_: ParseIntError) -> Self {
         Error::ParseError

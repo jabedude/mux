@@ -31,7 +31,7 @@ fn mux() {
 fn main() {
 
     // Connect to daemon
-    // let mut mux_tream = TcpStream::connect("127.0.0.1:8080").expect("Tcp Connect error");
+    let mut mux_stream = TcpStream::connect("127.0.0.1:8080").expect("Tcp Connect error");
 
     let mut cmds: Vec<MuxCmd> = Vec::new();
     loop {
@@ -51,6 +51,9 @@ fn main() {
             }
         };
         cmd.mux_id = cmds.len() + 1;
+        let mux_data = MuxData::Cmd(cmd.clone());
+        let serialized = serde_json::to_vec(&mux_data).unwrap();
+        mux_stream.write(&serialized);
         cmds.push(cmd);
     }
 }
