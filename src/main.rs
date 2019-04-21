@@ -30,8 +30,15 @@ fn mux() {
 
 fn main() {
 
+    // Connect to daemon
+    // let mut mux_tream = TcpStream::connect("127.0.0.1:8080").expect("Tcp Connect error");
+
     let mut input = String::new();
+    let mut cmds: Vec<MuxCmd> = Vec::new();
     loop {
+        for c in &cmds {
+            println!("{:?}", c);
+        }
         print!("mux > ");
         stdout().flush();
         stdin().read_line(&mut input).unwrap();
@@ -39,5 +46,6 @@ fn main() {
         println!("{}", input);
         let cmd: MuxCmd = input.parse().unwrap();
         println!("MuxCmd {:?}", cmd);
+        cmds.push(cmd);
     }
 }

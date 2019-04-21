@@ -1,15 +1,17 @@
 use std::str::FromStr;
 use std::num::ParseIntError;
 use std::net::IpAddr;
+use serde::{Serialize, Deserialize};
 
-#[repr(C)]
-pub struct ChanHeader {
-    pub channel_id: usize,
-    pub size: usize,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct MuxData {
+    pub mux_id: usize,
+    pub data: Vec<u8>,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MuxCmd {
+    //pub mux_id: usize,
     pub lport: u32,
     pub dport: u32,
     pub dest_ip: IpAddr,
