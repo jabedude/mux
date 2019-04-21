@@ -2,6 +2,8 @@ use std::net::{TcpListener, TcpStream, IpAddr};
 use std::io::Write;
 use std::io::Read;
 use std::io::{stdout, stdin};
+use std::str::FromStr;
+use std::num::ParseIntError;
 use std::str;
 
 use mux::ChanHeader;
@@ -10,6 +12,21 @@ struct MuxCmd {
     lport: u32,
     dport: u32,
     dest_ip: IpAddr,
+}
+
+impl FromStr for MuxCmd {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let input: Vec<&str> = s.split(" ").collect();
+        let lport = input[0].parse::<u32>()?;
+        let dport = input[2].parse::<u32>()?;
+        let dest_ip: IpAddr = input[1].parse().unwrap(); // TODO: fix
+
+        Ok (
+            MuxCmd {lport: lport, dport: dport, dest_ip: dest_ip}
+        )
+    }
 }
 
 fn mux() {
@@ -42,5 +59,7 @@ fn main() {
         stdout().flush();
         stdin().read_line(&mut input).unwrap();
         println!("{}", input);
+
+        let cmd: MuxCmd = input.parse().unwrap();
     }
 }
