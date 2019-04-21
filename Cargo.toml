@@ -5,3 +5,11 @@ authors = ["Josh Abraham <sinisterpatrician@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+
+[[bin]]
+name = "daemon"
+path = "src/daemon.rs"
+
+[[bin]]
+name = "client"
+path = "src/main.rs"
