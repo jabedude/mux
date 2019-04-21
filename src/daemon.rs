@@ -1,18 +1,11 @@
-use std::net::{TcpListener, TcpStream, IpAddr};
+use std::net::TcpListener;
+use std::net::TcpStream;
 use std::io::Write;
 use std::io::Read;
-use std::io::{stdout, stdin};
 use std::str;
 
-use mux::ChanHeader;
-
-struct MuxCmd {
-    lport: u32,
-    dport: u32,
-    dest_ip: IpAddr,
-}
-
-fn mux() {
+fn main() {
+    println!("Hello, world!");
     let listener = TcpListener::bind("0.0.0.0:8080").unwrap();
     let (mut in_stream,  addr) = listener.accept().unwrap();
     println!("new client: {:?}", addr);
@@ -31,16 +24,5 @@ fn mux() {
             }
             Err(_) => break,
         }
-    }
-}
-
-fn main() {
-
-    let mut input = String::new();
-    loop {
-        print!("mux > ");
-        stdout().flush();
-        stdin().read_line(&mut input).unwrap();
-        println!("{}", input);
     }
 }
