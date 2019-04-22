@@ -2,8 +2,11 @@ use std::net::{TcpListener, TcpStream};
 use std::io::Write;
 use std::io::Read;
 use std::io::{stdout, stdin};
+use std::thread;
+use std::sync::RwLock;
 use std::str;
 
+use mio::*;
 use mux::*;
 
 fn mux() {
@@ -31,9 +34,18 @@ fn mux() {
 fn main() {
 
     // Connect to daemon
-    let mut mux_stream = TcpStream::connect("127.0.0.1:8080").expect("Tcp Connect error");
+    let mut mux_stream = TcpStream::connect("127.0.0.1:8080").expect("tcp connect error");
 
     let mut cmds: Vec<MuxCmd> = Vec::new();
+
+    // Start thread and Poll instance
+    let poll = Poll::new().unwrap();
+
+    let handle = thread::spawn( || {
+        let mut events = Events::with_capacity(1024);
+        poll.poll(&mut events, None).unwrap();
+    });
+
     loop {
         for c in &cmds {
             println!("{:?}", c);
@@ -43,6 +55,12 @@ fn main() {
         let mut input = String::new();
         stdin().read_line(&mut input).unwrap();
         input.pop(); // Pop newline..TODO: maybe a better way?
+
+        if input == "help" || input == "?" {
+            println!("help menu TODO");
+            continue;
+        }
+
         let mut cmd: MuxCmd = match input.parse() {
             Ok(c) => c,
             Err(e) => {
@@ -50,10 +68,14 @@ fn main() {
                 continue;
             }
         };
+
+        // Hacky, set the mux_id of the cmd by using the len of the cmd vec
         cmd.mux_id = cmds.len() + 1;
         let mux_data = MuxData::Cmd(cmd.clone());
         let serialized = serde_json::to_vec(&mux_data).unwrap();
         mux_stream.write(&serialized);
         cmds.push(cmd);
     }
+
+    handle.join().unwrap();
 }

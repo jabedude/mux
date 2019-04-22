@@ -16,6 +16,15 @@ pub struct MuxTx {
     pub data: Vec<u8>,
 }
 
+impl MuxTx {
+    fn new(id: usize, data: Vec<u8>) -> Self {
+        MuxTx {
+            mux_id: id,
+            data: data,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MuxCmd {
     pub mux_id: usize,
@@ -54,9 +63,7 @@ impl FromStr for MuxCmd {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let input: Vec<&str> = s.split(":").collect();
         let lport = input[0].parse::<u32>()?;
-        println!("lport: {}", lport);
         let dport = input[2].parse::<u32>()?;
-        println!("dport: {}", dport);
         let dest_ip: IpAddr = input[1].parse()?; // TODO: fix
 
         Ok (MuxCmd {

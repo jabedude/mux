@@ -16,7 +16,9 @@ fn main() {
         let deserialized: MuxData = serde_json::from_slice(&buf[..recv]).unwrap();
         match deserialized {
             MuxData::Tx(tx) => println!("{:?}", tx),
-            MuxData::Cmd(cmd) => println!("{:?}", cmd),
+            MuxData::Cmd(cmd) => {
+                println!("{:?}", cmd)
+            }
         }
     }
 }
