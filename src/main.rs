@@ -1,6 +1,8 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::Write;
 use std::io::Read;
+use std::time::Duration;
+use std::sync::{Arc, Mutex};
 use std::io::{stdout, stdin};
 use std::thread;
 use std::sync::RwLock;
@@ -35,15 +37,18 @@ fn main() {
 
     // Connect to daemon
     let mut mux_stream = TcpStream::connect("127.0.0.1:8080").expect("tcp connect error");
+    let mux_stream = Arc::new(Mutex::new(mux_stream));
 
     let mut cmds: Vec<MuxCmd> = Vec::new();
 
     // Start thread and Poll instance
-    let poll = Poll::new().unwrap();
+    let poll = Arc::new(Mutex::new(Poll::new().unwrap()));
 
-    let handle = thread::spawn( || {
-        let mut events = Events::with_capacity(1024);
-        poll.poll(&mut events, None).unwrap();
+    crossbeam::scope(|scope| {
+        let _handle = scope.spawn( |_| {
+            let mut events = Events::with_capacity(1024);
+            poll.lock().unwrap().poll(&mut events, Some(Duration::from_secs(1))).unwrap();
+        });
     });
 
     loop {
@@ -73,9 +78,7 @@ fn main() {
         cmd.mux_id = cmds.len() + 1;
         let mux_data = MuxData::Cmd(cmd.clone());
         let serialized = serde_json::to_vec(&mux_data).unwrap();
-        mux_stream.write(&serialized);
+        mux_stream.lock().unwrap().write(&serialized);
         cmds.push(cmd);
     }
-
-    handle.join().unwrap();
 }
