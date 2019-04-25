@@ -58,6 +58,7 @@ fn main() {
                 loop {
                     let recv = sock.read(&mut buf).unwrap();
                     let mux_tx = MuxTx::new(id, buf.clone());
+                    println!("mux tx: {:?}", mux_tx);
                     let mux_data = MuxData::Tx(mux_tx);
                     let serialized = serde_json::to_vec(&mux_data).unwrap();
                     mux.lock().unwrap().write(&serialized);
