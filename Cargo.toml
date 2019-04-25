@@ -21,4 +21,4 @@ path = "src/daemon.rs"
 
 [[bin]]
 name = "client"
-path = "src/main.rs"
+path = "src/client.rs"

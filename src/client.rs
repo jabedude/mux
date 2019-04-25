@@ -48,6 +48,7 @@ fn main() {
 
             // Set up local port and thread
             // TODO: fix this mess
+            let id = cmd.mux_id;
             let port = cmd.lport;
             let mux = Arc::clone(&mux_stream);
             let _handle = thread::spawn( move || {
@@ -56,7 +57,10 @@ fn main() {
                 let mut buf: Vec<u8> = vec![0u8; 1024];
                 loop {
                     let recv = sock.read(&mut buf).unwrap();
-                    mux.lock().unwrap().write(&buf);
+                    let mux_tx = MuxTx::new(id, buf.clone());
+                    let mux_data = MuxData::Tx(mux_tx);
+                    let serialized = serde_json::to_vec(&mux_data).unwrap();
+                    mux.lock().unwrap().write(&serialized);
                 }
             });
 

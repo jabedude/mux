@@ -17,7 +17,7 @@ pub struct MuxTx {
 }
 
 impl MuxTx {
-    fn new(id: usize, data: Vec<u8>) -> Self {
+    pub fn new(id: usize, data: Vec<u8>) -> Self {
         MuxTx {
             mux_id: id,
             data: data,
