@@ -28,8 +28,8 @@ impl MuxTx {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MuxCmd {
     pub mux_id: usize,
-    pub lport: u32,
-    pub dport: u32,
+    pub lport: u16,
+    pub dport: u16,
     pub dest_ip: IpAddr,
 }
 
@@ -62,8 +62,8 @@ impl FromStr for MuxCmd {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let input: Vec<&str> = s.split(":").collect();
-        let lport = input[0].parse::<u32>()?;
-        let dport = input[2].parse::<u32>()?;
+        let lport = input[0].parse::<u16>()?;
+        let dport = input[2].parse::<u16>()?;
         let dest_ip: IpAddr = input[1].parse()?; // TODO: fix
 
         Ok (MuxCmd {

@@ -48,6 +48,7 @@ fn main() {
 
             // Set up local port and thread
             // TODO: fix this mess
+            // TODO: timeout?
             let id = cmd.mux_id;
             let port = cmd.lport;
             let mux = Arc::clone(&mux_stream);
@@ -56,12 +57,17 @@ fn main() {
                 let (mut sock, client) = listener.accept().unwrap();
                 let mut buf: Vec<u8> = vec![0u8; 1024];
                 loop {
-                    let recv = sock.read(&mut buf).unwrap();
-                    let mux_tx = MuxTx::new(id, buf.clone());
-                    let mux_data = MuxData::Tx(mux_tx);
-                    let serialized = serde_json::to_vec(&mux_data).unwrap();
-                    println!("serialized len: {}", serialized.len());
-                    mux.lock().unwrap().write(&serialized);
+                    match sock.read(&mut buf) {
+                        Ok(0) => continue,
+                        Ok(_) => {
+                            let mux_tx = MuxTx::new(id, buf.clone());
+                            let mux_data = MuxData::Tx(mux_tx);
+                            let serialized = serde_json::to_vec(&mux_data).unwrap();
+                            println!("serialized len: {}", serialized.len());
+                            mux.lock().unwrap().write(&serialized);
+                        }
+                        Err(e) => println!("Error: {:?}", e),
+                    }
                 }
             });
 
