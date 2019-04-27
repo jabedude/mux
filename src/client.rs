@@ -61,7 +61,6 @@ fn main() {
                     let mux_data = MuxData::Tx(mux_tx);
                     let serialized = serde_json::to_vec(&mux_data).unwrap();
                     println!("serialized len: {}", serialized.len());
-                    println!("serialized: {:?}", serialized);
                     mux.lock().unwrap().write(&serialized);
                 }
             });
