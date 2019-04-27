@@ -11,7 +11,7 @@ fn main() {
     let (mut mux_stream,  addr) = listener.accept().unwrap();
     println!("new client: {:?}", addr);
     loop {
-        let mut buf: Vec<u8> = vec![0u8; 1024];
+        let mut buf: Vec<u8> = vec![0u8; 4096];
         let recv = mux_stream.read(&mut buf).unwrap();
         println!("buf: {:?}", buf);
         let deserialized: MuxData = serde_json::from_slice(&buf[..recv]).expect("serde deserialize err");
